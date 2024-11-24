@@ -34,16 +34,6 @@ class SignupRequest(BaseModel):
 class DeleteRequest(BaseModel):
     email: str 
 
-@app.post("/login")
-async def login(request: LoginRequest):
-    try:
-        response = supabase.auth.sign_in_with_password({"email": request.email, "password": request.password})
-        if response.user:
-            return {"message": "Login realizado com sucesso!"}
-        else:
-            raise HTTPException(status_code=400, detail="Credenciais inválidas")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro no servidor: {e}")
 
 @app.post("/signup")
 async def signup(request: SignupRequest):
@@ -64,6 +54,17 @@ async def signup(request: SignupRequest):
         if "User already registered" in str(e):
             raise HTTPException(status_code=400, detail="Usuário já registrado com este e-mail")
         raise HTTPException(status_code=500, detail=f"Erro ao criar conta: {e}")
+    
+@app.post("/login")
+async def login(request: LoginRequest):
+    try:
+        response = supabase.auth.sign_in_with_password({"email": request.email, "password": request.password})
+        if response.user:
+            return {"message": "Login realizado com sucesso!"}
+        else:
+            raise HTTPException(status_code=400, detail="Credenciais inválidas")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro no servidor: {e}")
     
 @app.get("/all_accounts")
 def all_emails():
