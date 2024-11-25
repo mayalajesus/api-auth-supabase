@@ -16,7 +16,7 @@ supabase = create_client(
   key,
   options=ClientOptions(
     auto_refresh_token=False,
-    persist_session=True,
+    persist_session=False,
   )
 )
 
@@ -65,6 +65,18 @@ async def login(request: LoginRequest):
             raise HTTPException(status_code=400, detail="Credenciais inválidas")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro no servidor: {e}")
+
+@app.post("/signout")
+async def signout():
+    try:
+        # Executa o logout do usuário
+        supabase.auth.sign_out()
+        
+        # Retorna uma mensagem de sucesso
+        return {"message": "Você saiu da conta com sucesso."}
+    except Exception as e:
+        # Tratar qualquer erro inesperado
+        raise HTTPException(status_code=500, detail=f"Erro no servidor: {str(e)}")
     
 @app.get("/all_accounts")
 async def all_emails():
