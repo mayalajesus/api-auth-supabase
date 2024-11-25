@@ -84,11 +84,15 @@ async def all_emails():
     try:
         # Usando a API Admin para listar todos os usuários
         response = ADMIN_CLIENT.auth.admin.list_users()
-        
-        # Extraindo os emails dos usuários
+
         if response:
-            emails = [{"email": user.email} for user in response if user.email]
-            return {"users": emails}
+            # Filtrar e-mails que não são strings aleatórias
+            active_users = [
+                {"email": user.email}
+                for user in response
+                if user.email and "@" in user.email  # Garante que é um e-mail válido
+            ]
+            return {"active_users": active_users}
         else:
             return {"message": "Nenhum usuário encontrado"}
     except Exception as e:
