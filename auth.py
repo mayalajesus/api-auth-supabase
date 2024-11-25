@@ -43,7 +43,7 @@ class SignupRequest(BaseModel):
 @app.post("/signup")
 async def signup(request: SignupRequest):
     try:
-        # Criar usuário no Supabase
+        # Tentativa de criar conta
         response = USER_CLIENT.auth.sign_up({
             "email": request.email,
             "password": request.password
@@ -56,12 +56,17 @@ async def signup(request: SignupRequest):
                 "user": {"email": response.user.email, "created_at": response.user.created_at}
             }
 
+        # Caso não haja erro explícito, mas também não retorne um usuário
         raise HTTPException(status_code=400, detail="Erro desconhecido ao criar a conta")
+    
     except Exception as e:
         logging.error(f"Erro ao criar conta: {e}")
-        if "User already registered" in str(e):
-            raise HTTPException(status_code=400, detail="E-mail já registrado")
-        raise HTTPException(status_code=500, detail="Erro interno do servidor")
+        # Capturar erro de formato de e-mail inválido
+        if "Unable to validate email address: invalid format" in str(e):
+            raise HTTPException(status_code=400, detail="Digite um formato de e-mail válido")
+        
+        # Outros erros genéricos
+        raise HTTPException(status_code=500, detail="Erro interno do servidor ao criar a conta.")
 
 
 @app.post("/login")
