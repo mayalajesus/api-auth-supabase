@@ -81,34 +81,13 @@ async def signout():
 @app.get("/all_accounts")
 async def all_emails():
     try:
-        # Obtém a lista de usuários
-        response = supabase.auth.admin.list_users()
-
-        # Verifica se a resposta contém usuários
-        if response:
-            # Extrair IDs e e-mails
-            users_data = [
-                {
-                    "email": user.email
-                }
-                for user in response
-            ]
-            
-            return {
-                "message": "Lista de e-mails cadastrados",
-                "users": users_data
-            }
+        response = supabase.from_("users").select("email").execute()
+        if response.data:
+            return response.data
         else:
-            return {
-                "message": "Nenhum usuário encontrado",
-                "users": []
-            }
+            return {"error": "Nenhum dado encontrado"}
     except Exception as e:
-        return {
-            "message": "Erro ao listar usuários",
-            "error": str(e)
-        }
-    
+        return {"error": str(e)}
 
 async def get_users():
     try:
