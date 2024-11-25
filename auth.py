@@ -67,7 +67,7 @@ async def login(request: LoginRequest):
         raise HTTPException(status_code=500, detail=f"Erro no servidor: {e}")
     
 @app.get("/all_accounts")
-def all_emails():
+async def all_emails():
     try:
         # Obtém a lista de usuários
         response = supabase.auth.admin.list_users()
@@ -98,7 +98,7 @@ def all_emails():
         }
     
 
-def get_users():
+async def get_users():
     try:
         # Obtém a lista de usuários
         response = supabase.auth.admin.list_users()
